@@ -5,18 +5,18 @@ import { CopyButton, DeleteButton, EmailNow } from "./Actions";
 
 export const dynamic = "force-dynamic";
 
-export default function Today() {
+export default async function Today() {
   const date = todayStr();
-  const settings = getSettings();
-  const entries = entriesOn(date);
-  const summary = buildSummary(allEntries(), date);
+  const settings = await getSettings();
+  const entries = await entriesOn(date);
+  const summary = buildSummary(await allEntries(), date);
   const text = summaryText(summary);
   const phone = settings.owner_phone;
 
   return (
     <>
       <h1>Today <span className="muted">{date}</span></h1>
-      <QuickAdd items={allItems()} who={settings.my_name || "me"} date={date} phone={phone ?? ""} />
+      <QuickAdd items={await allItems()} who={settings.my_name || "me"} date={date} phone={phone ?? ""} />
 
       <div className="card">
         <div className="muted">Today&apos;s total</div>

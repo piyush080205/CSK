@@ -3,8 +3,8 @@ import { buildSummary, summaryText } from "@/lib/summary";
 
 export const dynamic = "force-dynamic";
 
-export default function History() {
-  const entries = allEntries();
+export default async function History() {
+  const entries = await allEntries();
   const dates = [...new Set(entries.map((e) => e.date))].reverse();
   return (
     <>

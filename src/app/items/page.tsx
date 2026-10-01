@@ -3,11 +3,11 @@ import ItemsForm from "./ItemsForm";
 
 export const dynamic = "force-dynamic";
 
-export default function Items() {
+export default async function Items() {
   return (
     <>
       <h1>Items</h1>
-      <ItemsForm items={allItems()} />
+      <ItemsForm items={await allItems()} />
     </>
   );
 }

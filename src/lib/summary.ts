@@ -72,7 +72,6 @@ export function whatsappLink(phone: string, text: string): string {
   return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }
 
-export const todayStr = (now = new Date()) => {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
-};
+/** Today's date in the cafe's timezone (servers like Vercel run in UTC). */
+export const todayStr = (now = new Date(), tz = process.env.APP_TIMEZONE ?? "Asia/Kolkata") =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
