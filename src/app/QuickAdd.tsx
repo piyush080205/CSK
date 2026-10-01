@@ -1,10 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { whatsappLink } from "@/lib/summary";
 
 type Item = { id: number; name: string; price: number };
 
-export default function QuickAdd({ items, who, date }: { items: Item[]; who: string; date: string }) {
+export default function QuickAdd({ items, who, date, phone }: { items: Item[]; who: string; date: string; phone: string }) {
   const router = useRouter();
   const [item, setItem] = useState("");
   const [qty, setQty] = useState("1");
@@ -12,7 +13,22 @@ export default function QuickAdd({ items, who, date }: { items: Item[]; who: str
   const [kind, setKind] = useState<"purchase" | "payment">("purchase");
   const [note, setNote] = useState("");
 
-  async function add(body: object) {
+  const [notify, setNotify] = useState(false);
+  useEffect(() => {
+    try { setNotify(localStorage.getItem("notify") === "1"); } catch {}
+  }, []);
+
+  type Body = { kind?: "purchase" | "payment"; item: string; qty: number | string; price: number | string; note?: string };
+
+  async function add(body: Body) {
+    // Open WhatsApp synchronously inside the click so popup blockers allow it.
+    if (notify && phone) {
+      const amt = Number(body.qty) * Number(body.price);
+      const text = body.kind === "payment"
+        ? `${who || "I"} paid ${amt}`
+        : `${body.item} x${body.qty} = ${amt} added by ${who || "me"}`;
+      window.open(whatsappLink(phone, text), "_blank");
+    }
     await fetch("/api/entries", { method: "POST", body: JSON.stringify({ added_by: who, date, ...body }) });
     router.refresh();
   }
@@ -26,6 +42,14 @@ export default function QuickAdd({ items, who, date }: { items: Item[]; who: str
   return (
     <div className="card">
       <h2>Quick add</h2>
+      <label style={{ display: "flex", gap: 8, alignItems: "center", color: "inherit", fontSize: "1em" }}>
+        <input type="checkbox" style={{ width: "auto" }} checked={notify} onChange={(e) => {
+          setNotify(e.target.checked);
+          try { localStorage.setItem("notify", e.target.checked ? "1" : "0"); } catch {}
+        }} />
+        Open WhatsApp to notify owner after each add
+      </label>
+      {notify && !phone && <p className="msg">Set the owner&apos;s WhatsApp number in Settings first.</p>}
       <div className="grid">
         {items.map((i) => (
           <button key={i.id} onClick={() => add({ item: i.name, qty: 1, price: i.price })}>

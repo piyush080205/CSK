@@ -16,7 +16,7 @@ export default function Today() {
   return (
     <>
       <h1>Today <span className="muted">{date}</span></h1>
-      <QuickAdd items={allItems()} who={settings.my_name || "me"} date={date} />
+      <QuickAdd items={allItems()} who={settings.my_name || "me"} date={date} phone={phone ?? ""} />
 
       <div className="card">
         <div className="muted">Today&apos;s total</div>
